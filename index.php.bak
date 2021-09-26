@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta chartset="utf-8" />
+		<title>vtmp</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+	</head>
+	<body>
+		<div id="zero">	
+		<div id="content">
+		<?php
+				function createVMSList($filename) {
+				
+					if ( file($filename) ) {
+						$lines=file($filename);
+						echo "<ul class=\"vmlists\">";
+						foreach ($lines as $line) {
+
+							$lineDetails=explode(';', $line);
+							echo "<li><u>" . $lineDetails[0] . "</u>
+								<ul class=\"vmlists\">";
+							$filename1=trim($lineDetails[1]);
+							$filepath=$filename1;
+							$filename1=$filename1 . "/list.csv";
+							if ( file($filename1) ) {
+								$machines=file($filename1);
+								foreach ($machines as $machine) {
+							
+									$machineDetails=explode(';', $machine);
+									echo "<li>
+										<table><tr>
+											<td><img src=\"" . $machineDetails[0] . "\" /></td>
+											<td><a href=\"" . $filepath . "/" . $machineDetails[2] . "\">" . $machineDetails[1] . "</a></td>
+											<td>" . $machineDetails[3] . "</td><td>" . $machineDetails[4] . "</td>
+										</tr></table>
+									</li>";
+
+								}
+							} else {
+								echo "<li>Nie odnaleziono pliku bazy</li>";
+							}
+
+							echo "</ul></li>";
+				
+
+
+						}
+						echo "</ul>";
+					
+					
+					} else {
+
+						echo "<h3>Nie odnaleziono pliku bazy</h3>";
+					}
+				
+				}
+
+			if ($_GET['page'] == 'main') {
+			
+				echo "	<p>
+					<img id=\"ovfimg\" src=\"ovftool.png\" />
+					<cap>VTMP</cap>, jest witryną gdzie można pobrać gotowe urządzenia
+					wirtualne środowiska VirtualBox, z preinstalowanymi systemami 
+					operacyjnymi. Powstanie tej witryny jest efektem frustracji twórcy,
+					który praganie zaoszczędzić twój czas spędzony na tępym gapieniu
+					się w ekran w oczekiwaniu na zainstalowanie systemu. Udostępnione
+					tu maszyny są czystymi systemami, wyeksportowanymi zaraz po pierwszym
+					uruchomieniu po instalacji, po upewnieniu się ze wszystko jest ok.
+					Maszyny posiadają tyle pamięci RAM ile zasugerował VirtualBox. Może
+					być jej więcej lub znacznie więcej, w zależności od tego ile będzie
+					wymagał system do płynnej pracy. Ustawienia sieciowe są ustawione
+					zawsze natywnie na NAT. Systemy operacyjne serwerowe z rodziny 
+					GNU Linux, mają zawsze zainstalowane SSH, aby można było je od razu
+					uruchamiać w trybie headless, oczywiście aby była możliwość połączenia
+					się z maszyną należy odpowiednio skonfigurować sieć. Same dyski są
+					również dostępne. Dyski maszyn dostępne są w formacie VMDK, ponieważ
+					wypakowywane z formatu OVA wyeksportowanych maszyn. Jeśli system wymaga
+					licencji, to maszyna wirtualna z danym system pojawi się jedynie wtedy
+					gdy podczas instalacji nie będzie wymagany klucz licencji lub jego 
+					aktywacja.</p>
+					<p>
+					Przygotowane maszyny są udostępnione tutaj bez gwarancji przydatności
+					oraz mogą one się w ogóle nie zaimportować do Państwa środowisk
+					wirtualnych.
+					</p>";
+					
+
+			} else if ($_GET['page'] == 'vms') {
+				echo "<div id=\"changelogvms\">
+					<h3>Lista zmian dotycząca maszyn: </h3>
+					<p>
+						<ul>
+							<li>2020-11-10 - Testowy wpis</li>
+							<li>2020-11-10 - Ubuntu zrywa z architektura x86 (32-bit), od 18.04. 
+								Więc przy maszynach tej dystrybucji od wersji 18.04 nie będzie oznaczeń architektury.
+								Zatem wszystkie maszyny są 64-bitowe.</li>
+						</ul>
+					</p>
+					<h3>Odnośnie danych logownia...</h3>
+					<p>
+						<ul>
+							<li>Dla dystrybucji Linuxowych oraz systemów rodziny BSD oraz innych (jeśli dane logowania będą wymagane):<br />
+								<br />
+								<table>
+									<tr><th>Rozdaj użytkownika</th><th>Nazwa użytkownika</th><th>Hasło</th></tr>
+									<tr><td>Zwykły użytkownik</td><td>user</td><td>user1</td></tr>
+									<tr><td>Administrator (root)</td><td>root</td><toor</td></tr>
+								</table>
+							</li>
+							<br />
+							<br />
+							<li>Dla systemów Microsoft Windows:<br />
+								<br />
+								<table>
+									<tr><th>Rodzaj systemu</th><th>Nazwa użytkownika</th><th>Hasło</th></tr>
+									<tr><td>Windowsy desktopowe</td><td>Admin</td><td>(brak)</td></tr>
+									<tr><td>Windowsy serwerowe</td><td>Administrator</td><td>Qwertyuiop1@</td></tr>
+								</table>
+							</li>
+						</ul>
+					</p>
+					</div>
+					<div id=\"allvmlist\">";
+
+						$filename='vms/list.csv';
+						$categories=file($filename);
+						foreach ($categories as $cat) {
+						
+							$catList=explode(';', $cat);
+							echo "<p>";
+							echo "<h3>" . $catList[0] . ":</h3>";
+								$filename1=trim($catList[1]);
+								$systems=file($filename1);
+								echo "<ul class=\"vmlists\">";
+								foreach ($systems as $sys_ver) {
+								
+									$systemList=explode(";", $sys_ver);
+									echo "<li><u>$systemList[0]</u>:";
+										$filename2=trim($systemList[1]);
+										$filepath=$filename2;
+										$filename2=$filename2 . "/list.csv";
+										$machines=file($filename2);
+										echo "<ul class=\"vmlists\">";
+										foreach ($machines as $machine) {
+
+											echo "<li>";
+											$machineDetails=explode(';', $machine);
+											echo "<table><tr>
+												<td><img src=\"" . $machineDetails[0] . "\" /></td>
+												<td><a href=\"" . $filepath . "/" . $machineDetails[2] . "\">" . $machineDetails[1] . "</td>
+												<td>" . $machineDetails[3] . "</td>
+												<td>" . $machineDetails[4] . "</td>
+											</tr></table>";
+											echo "</li>";
+											
+										}
+										echo "</ul>";
+									echo "</li>";
+								}
+								echo "</ul>";
+							
+							echo "</p>";
+						}					
+						
+					echo "</div>";
+
+			} else if ($_GET['page'] == 'adjust') {
+				echo "";
+
+			} else if ($_GET['page'] == 'changelog') { 
+
+				echo "<h3>Lista zmian</h3>
+					<p>
+					<ul>
+						<li>2020-11-10 12:10 - Rozpoczęcie prac na VTMP</li>
+					</ul>
+					</p>";
+			
+			} else if ($_GET['page'] == 'test') { 
+			
+				$fname='vms/linux/distros.csv';
+				createVMSList($fname);
+
+			} else {
+
+				header("Location: index.php?page=main");
+			}
+		?>
+		</div>
+		<div id="menu">
+			<ul id="mainmenu">
+				<li><a href="index.php?page=main">Strona główna</a></li>
+				<li>
+					<a href="index.php?page=vms">Maszyny wirtualne</a>
+					<?php
+						if ($_GET['page'] == 'vms') {
+							echo "<ul class=\"secondmenu\">
+								<li><a href=\"index.php?page=vms&os=bsd\">BSD</a></li>
+								<li><a href=\"index.php?page=vms&os=linux\">Linux</a></li>
+								<li><a href=\"index.php?page=vms&os=windows\">Windows</a></li>
+								<li><a href=\"index.php?page=vms&os=others\">Inne</a></li>
+								</ul>";
+						}
+					?>
+				</li>
+				<li><a href="index.php?page=vmdk">Dyski maszyn wirtualnych</a></li>
+				<li>
+					<a href="index.php?page=adjust">Dostosowywanie maszyny</a>
+					<?php
+						if ($_GET['page'] == 'adjust') {
+							echo "<ul class=\"secondmenu\">
+								<li><a href=\"index.php?page=adjust&type=cli\">vboxmanage</a></li>
+								<li><a href=\"index.php?page=adjust&type=gui\">VirtualBox GUI</a></li>
+								</ul>";
+						}
+					?>
+				</li>
+				<li><a href="index.php?page=changelog">Lista zmian</a></li>
+			</ul>
+		</div>
+		</div>
+	</body>
+</html>
